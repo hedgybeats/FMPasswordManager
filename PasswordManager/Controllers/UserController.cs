@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using EmailSender.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PasswordManager.Contexts;
 using PasswordManager.DTOs;
 using PasswordManager.Models;
+using PasswordManager.Services.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,10 +16,13 @@ namespace PasswordManager.Controllers
     public class UserController : ControllerBase
     {
         private readonly AppDbContext _context;
-
-        public UserController(AppDbContext context)
+        private readonly IDateTimeService _dateTimeService;
+        private readonly IEmailSenderService _emailSenderService;
+        public UserController(AppDbContext context, IDateTimeService dateTimeService, IEmailSenderService emailSenderService)
         {
             _context = context;
+            _dateTimeService = dateTimeService;
+            _emailSenderService = emailSenderService;
         }
 
         // GET: api/Users
@@ -78,13 +83,22 @@ namespace PasswordManager.Controllers
             var user = new User
             {
                 Email = addUserDto.Email,
-                MasterPassword = addUserDto.MasterPassword
+                MasterPassword = addUserDto.MasterPassword,
+                CreatedAt = _dateTimeService.UtcNow()
             };
 
             _context.User.Add(user);
             await _context.SaveChangesAsync();
 
             return Ok(new { id = user.Id });
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetMasterPassword(string email)
+        {
+            await _emailSenderService.SenderEmailAsync(email, "Reset Your Password", "reset password body");
+            return Ok();
+
         }
 
         // DELETE: api/Users/5

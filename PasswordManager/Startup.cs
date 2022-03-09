@@ -9,6 +9,10 @@ using PasswordManager.Contexts;
 using PasswordManager.Middleware;
 using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.SwaggerUI;
+using PasswordManager.Services.Interfaces;
+using PasswordManager.Services;
+using EmailSender.Services.Interfaces;
+using EmailSender.Models;
 
 namespace PasswordManager
 {
@@ -24,7 +28,8 @@ namespace PasswordManager
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
+            services.Configure<SmtpSettings>(_configuration.GetSection("SmtpSettings"));
+            services.AddSingleton<IEmailSenderService, EmailSenderService>();
             services.AddControllers();
             services.AddControllers().AddNewtonsoftJson(options =>
             {
@@ -47,12 +52,19 @@ namespace PasswordManager
 
             // Add services here
 
-
+            services.AddScoped<IDateTimeService, DateTimeService>();
             // _________________
 
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "PasswordManager", Version = "v1" });
+
+                c.SwaggerDoc("v1", new OpenApiInfo 
+                { 
+                    Title = "PasswordManager", 
+                    Version = "v1" 
+
+
+                });
             });
         }
 

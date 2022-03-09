@@ -9,7 +9,6 @@ namespace PasswordManager.Models
         {
             StoredPasswords = new List<StoredPassword>();
         }
-
         public string Email { get; set; }
         public string MasterPassword { get; set; }
         public ICollection<StoredPassword> StoredPasswords { get; set; }
