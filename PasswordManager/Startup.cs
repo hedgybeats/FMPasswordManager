@@ -1,3 +1,5 @@
+using EmailSender.Models;
+using EmailSender.Services.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -5,14 +7,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json;
 using PasswordManager.Contexts;
 using PasswordManager.Middleware;
-using Newtonsoft.Json;
-using Swashbuckle.AspNetCore.SwaggerUI;
-using PasswordManager.Services.Interfaces;
 using PasswordManager.Services;
-using EmailSender.Services.Interfaces;
-using EmailSender.Models;
+using PasswordManager.Services.Interfaces;
 
 namespace PasswordManager
 {
@@ -53,15 +52,17 @@ namespace PasswordManager
             // Add services here
 
             services.AddScoped<IDateTimeService, DateTimeService>();
+
+            services.AddScoped<IPasswordService, PasswordService>();
             // _________________
 
             services.AddSwaggerGen(c =>
             {
 
-                c.SwaggerDoc("v1", new OpenApiInfo 
-                { 
-                    Title = "PasswordManager", 
-                    Version = "v1" 
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "PasswordManager",
+                    Version = "v1"
 
 
                 });
