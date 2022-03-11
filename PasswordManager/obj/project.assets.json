@@ -7701,11 +7701,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\User\\Documents\\GIT repository\\FMPasswordManager\\PasswordManager\\PasswordManager.csproj",
+      "projectUniqueName": "C:\\Users\\User\\Documents\\Git Projects\\FMPasswordManager\\FMPasswordManager\\PasswordManager\\PasswordManager.csproj",
       "projectName": "PasswordManager",
-      "projectPath": "C:\\Users\\User\\Documents\\GIT repository\\FMPasswordManager\\PasswordManager\\PasswordManager.csproj",
+      "projectPath": "C:\\Users\\User\\Documents\\Git Projects\\FMPasswordManager\\FMPasswordManager\\PasswordManager\\PasswordManager.csproj",
       "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\User\\Documents\\GIT repository\\FMPasswordManager\\PasswordManager\\obj\\",
+      "outputPath": "C:\\Users\\User\\Documents\\Git Projects\\FMPasswordManager\\FMPasswordManager\\PasswordManager\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\User\\AppData\\Roaming\\NuGet\\NuGet.Config",
