@@ -54,6 +54,7 @@ namespace PasswordManager
             services.AddScoped<IDateTimeService, DateTimeService>();
 
             services.AddScoped<IPasswordService, PasswordService>();
+            services.AddScoped<IUserService, UserService>();
             // _________________
 
             services.AddSwaggerGen(c =>

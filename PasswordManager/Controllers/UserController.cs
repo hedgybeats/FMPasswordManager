@@ -18,11 +18,13 @@ namespace PasswordManager.Controllers
         private readonly AppDbContext _context;
         private readonly IDateTimeService _dateTimeService;
         private readonly IEmailSenderService _emailSenderService;
-        public UserController(AppDbContext context, IDateTimeService dateTimeService, IEmailSenderService emailSenderService)
+        private readonly IUserService _userService;
+        public UserController(AppDbContext context, IDateTimeService dateTimeService, IEmailSenderService emailSenderService, IUserService userService)
         {
             _context = context;
             _dateTimeService = dateTimeService;
             _emailSenderService = emailSenderService;
+            _userService = userService;
         }
 
         // GET: api/Users
@@ -80,17 +82,7 @@ namespace PasswordManager.Controllers
         [HttpPost]
         public async Task<ActionResult<User>> PostUser(AddUserDTO addUserDto)
         {
-            var user = new User
-            {
-                Email = addUserDto.Email,
-                MasterPassword = addUserDto.MasterPassword,
-                CreatedAt = _dateTimeService.UtcNow()
-            };
-
-            _context.User.Add(user);
-            await _context.SaveChangesAsync();
-
-            return Ok(new { id = user.Id });
+            return Ok(new { id = await _userService.AddUser(addUserDto) });
         }
 
         [HttpPost("reset-password")]
