@@ -1,12 +1,11 @@
 ﻿using EmailSender.Models;
 using EmailSender.Services.Interfaces;
+using MailKit.Net.Smtp;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using System;
 using System.Net;
 using System.Threading.Tasks;
-using MailKit.Net.Smtp;
-using MailKit.Security;
 
 namespace PasswordManager.Services
 {
@@ -27,7 +26,7 @@ namespace PasswordManager.Services
             message.Subject = subject;
             message.Body = new TextPart("Plain")
             {
-                Text= body
+                Text = body
             };
             var client = new SmtpClient();
             try
@@ -48,4 +47,4 @@ namespace PasswordManager.Services
         }
     }
 }
-    
+
