@@ -6,5 +6,6 @@ namespace PasswordManager.Services.Interfaces
     public interface IUserService
     {
         Task<int> AddUser(AddUserDTO addUserDto);
+        Task<int> AuthenticateUser(AuthenticateUserDTO authenticateUserDto);
     }
 }
