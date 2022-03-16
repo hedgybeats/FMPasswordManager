@@ -61,7 +61,12 @@ namespace PasswordManager.Controllers
         {
             await _emailSenderService.SenderEmailAsync(email, "Reset Your Password", "reset password body");
             return Ok();
+        }
 
+        [HttpPost("authenticate")]
+        public async Task<IActionResult> AuthentiateUser(AuthenticateUserDTO authenticateUserDto)
+        {
+            return Ok(new { id = await _userService.AuthenticateUser(authenticateUserDto) });
         }
 
         // DELETE: api/Users/5
