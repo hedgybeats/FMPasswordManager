@@ -5,6 +5,8 @@ namespace PasswordManager.Models
 {
     public class User : BaseEntity
     {
+        internal object id;
+
         public User()
         {
             StoredPasswords = new List<StoredPassword>();
