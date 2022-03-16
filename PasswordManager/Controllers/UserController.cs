@@ -18,63 +18,36 @@ namespace PasswordManager.Controllers
         private readonly AppDbContext _context;
         private readonly IDateTimeService _dateTimeService;
         private readonly IEmailSenderService _emailSenderService;
+        private readonly IUserService _userService;
         private readonly IStoredPasswordService _storedPasswordService;
-        public UserController(AppDbContext context, IDateTimeService dateTimeService, IEmailSenderService emailSenderService, IStoredPasswordService storedPassword)
+        public UserController(AppDbContext context, IDateTimeService dateTimeService, IEmailSenderService emailSenderService, IUserService userService, IStoredPasswordService storedPassword)
         {
             _context = context;
             _dateTimeService = dateTimeService;
             _emailSenderService = emailSenderService;
+            _userService = userService;
             _storedPasswordService = storedPassword;
         }
 
         // GET: api/Users
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUser()
+        public async Task<ActionResult<ICollection<User>>> GetUsers()
         {
-            return Ok(await _context.User.Include(x => x.StoredPasswords).ToListAsync());
+            return await _userService.GetUsers();
         }
 
         // GET: api/Users/5
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUser(int id)
         {
-            var user = await _context.User.Include(x => x.StoredPasswords).SingleOrDefaultAsync(x => x.Id == id);
-
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(user);
+            return await _userService.GetUser(id);
         }
 
         // PUT: api/Users/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUser(int id, User user)
         {
-            if (id != user.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(user).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!await UserExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
+            await _userService.PutUser(id, user);
             return Ok();
         }
 
@@ -82,17 +55,7 @@ namespace PasswordManager.Controllers
         [HttpPost]
         public async Task<ActionResult<User>> PostUser(AddUserDTO addUserDto)
         {
-            var user = new User
-            {
-                Email = addUserDto.Email,
-                MasterPassword = addUserDto.MasterPassword,
-                CreatedAt = _dateTimeService.UtcNow()
-            };
-
-            _context.User.Add(user);
-            await _context.SaveChangesAsync();
-
-            return Ok(new { id = user.Id });
+            return Ok(new { id = await _userService.AddUser(addUserDto) });
         }
 
         [HttpPost("reset-password")]
@@ -104,32 +67,20 @@ namespace PasswordManager.Controllers
                 }
             await _emailSenderService.SenderEmailAsync(email, "Reset Your Password", "reset password body");
             return Ok();
+        }
 
+        [HttpPost("authenticate")]
+        public async Task<IActionResult> AuthentiateUser(AuthenticateUserDTO authenticateUserDto)
+        {
+            return Ok(new { id = await _userService.AuthenticateUser(authenticateUserDto) });
         }
 
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
-            var user = await _context.User.FindAsync(id);
-            if (user == null)
-            {
-                throw new ApiException($"A user with id {id} could not be found.");
-            }
-
-            _context.User.Remove(user);
-            await _context.SaveChangesAsync();
-
-            return Ok();
-        }
-
-        private async Task<bool> UserExists(int id)
-        {
-            return await _context.User.AnyAsync(user => user.Id == id);
-        }
-        private async Task<bool> EmailExists(string email)
-        {
-         return await _context.User.AnyAsync(user => user.Email == email);
-        }
+           await _userService.DeleteUser(id);
+           return Ok();
+        } 
     }
 }

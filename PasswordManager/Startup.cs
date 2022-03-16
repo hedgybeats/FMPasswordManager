@@ -1,3 +1,5 @@
+using EmailSender.Models;
+using EmailSender.Services.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -5,14 +7,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json;
 using PasswordManager.Contexts;
 using PasswordManager.Middleware;
-using Newtonsoft.Json;
-using Swashbuckle.AspNetCore.SwaggerUI;
-using PasswordManager.Services.Interfaces;
 using PasswordManager.Services;
-using EmailSender.Services.Interfaces;
-using EmailSender.Models;
+using PasswordManager.Services.Interfaces;
+using System.Collections.Generic;
 
 namespace PasswordManager
 {
@@ -53,18 +53,44 @@ namespace PasswordManager
             // Add services here
 
             services.AddScoped<IDateTimeService, DateTimeService>();
+
+            services.AddScoped<IPasswordService, PasswordService>();
+            services.AddScoped<IUserService, UserService>();
             services.AddScoped<IStoredPasswordService, StoredPasswordService>();
             // _________________
 
             services.AddSwaggerGen(c =>
             {
 
-                c.SwaggerDoc("v1", new OpenApiInfo 
-                { 
-                    Title = "PasswordManager", 
-                    Version = "v1" 
-
-
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "PasswordManager",
+                    Version = "v1"
+                });
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    Description = "Input your Bearer token in this format - Bearer {your token here} to access this API",
+                });
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer",
+                            },
+                            Scheme = "Bearer",
+                            Name = "Bearer",
+                            In = ParameterLocation.Header,
+                        }, new List<string>()
+                    },
                 });
             });
         }
