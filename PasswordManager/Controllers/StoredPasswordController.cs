@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PasswordManager.Contexts;
 using PasswordManager.DTOs;
@@ -22,6 +23,7 @@ namespace PasswordManager.Controllers
 
         // GET: api/StoredPassword
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<StoredPassword>>> GetStoredPassword()
         {
             return Ok(await _context.StoredPassword.ToListAsync());
@@ -29,6 +31,7 @@ namespace PasswordManager.Controllers
 
         // GET: api/StoredPassword/5
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult<StoredPassword>> GetStoredPassword(int id)
         {
             var storedPassword = await _context.StoredPassword.FindAsync(id);
@@ -43,6 +46,7 @@ namespace PasswordManager.Controllers
 
         // PUT: api/StoredPassword/5
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> PutStoredPassword(int id, StoredPassword storedPassword)
         {
             if (id != storedPassword.Id)
@@ -73,6 +77,7 @@ namespace PasswordManager.Controllers
 
         // POST: api/StoredPassword
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<StoredPassword>> PostStoredPassword(AddStoredPasswordDTO addStoredPasswordDto)
         {
             var user = await _context.User.Where(x => x.Id == addStoredPasswordDto.UserId)
@@ -97,6 +102,7 @@ namespace PasswordManager.Controllers
 
         // DELETE: api/StoredPassword/5
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteStoredPassword(int id)
         {
             var storedPassword = await _context.StoredPassword.FindAsync(id);
@@ -111,6 +117,7 @@ namespace PasswordManager.Controllers
             return Ok();
         }
 
+        [Authorize]
         private bool StoredPasswordExists(int id)
         {
             return _context.StoredPassword.Any(e => e.Id == id);

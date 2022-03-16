@@ -1,12 +1,11 @@
 ﻿using EmailSender.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using PasswordManager.Contexts;
 using PasswordManager.DTOs;
 using PasswordManager.Models;
 using PasswordManager.Services.Interfaces;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace PasswordManager.Controllers
@@ -29,6 +28,7 @@ namespace PasswordManager.Controllers
 
         // GET: api/Users
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<ICollection<User>>> GetUsers()
         {
             return await _userService.GetUsers();
@@ -36,6 +36,7 @@ namespace PasswordManager.Controllers
 
         // GET: api/Users/5
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult<User>> GetUser(int id)
         {
             return await _userService.GetUser(id);
@@ -43,6 +44,7 @@ namespace PasswordManager.Controllers
 
         // PUT: api/Users/5
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> PutUser(int id, User user)
         {
             await _userService.PutUser(id, user);
@@ -51,6 +53,7 @@ namespace PasswordManager.Controllers
 
         // POST: api/Users
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<User>> PostUser(AddUserDTO addUserDto)
         {
             return Ok(new { id = await _userService.AddUser(addUserDto) });
@@ -66,15 +69,16 @@ namespace PasswordManager.Controllers
         [HttpPost("authenticate")]
         public async Task<IActionResult> AuthentiateUser(AuthenticateUserDTO authenticateUserDto)
         {
-            return Ok(new { id = await _userService.AuthenticateUser(authenticateUserDto) });
+            return Ok(new { token = await _userService.AuthenticateUser(authenticateUserDto) });
         }
 
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteUser(int id)
         {
-           await _userService.DeleteUser(id);
-           return Ok();
-        } 
+            await _userService.DeleteUser(id);
+            return Ok();
+        }
     }
 }
