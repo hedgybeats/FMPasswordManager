@@ -18,11 +18,13 @@ namespace PasswordManager.Controllers
         private readonly AppDbContext _context;
         private readonly IDateTimeService _dateTimeService;
         private readonly IEmailSenderService _emailSenderService;
-        public UserController(AppDbContext context, IDateTimeService dateTimeService, IEmailSenderService emailSenderService)
+        private readonly IStoredPasswordService _storedPasswordService;
+        public UserController(AppDbContext context, IDateTimeService dateTimeService, IEmailSenderService emailSenderService, IStoredPasswordService storedPassword)
         {
             _context = context;
             _dateTimeService = dateTimeService;
             _emailSenderService = emailSenderService;
+            _storedPasswordService = storedPassword;
         }
 
         // GET: api/Users
@@ -63,7 +65,7 @@ namespace PasswordManager.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!UserExists(id))
+                if (!await UserExists(id))
                 {
                     return NotFound();
                 }
@@ -96,6 +98,10 @@ namespace PasswordManager.Controllers
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetMasterPassword(string email)
         {
+            if (!await EmailExists(email))
+                {
+                    throw new ApiException($"Email adress {email} could not be found");
+                }
             await _emailSenderService.SenderEmailAsync(email, "Reset Your Password", "reset password body");
             return Ok();
 
@@ -117,9 +123,13 @@ namespace PasswordManager.Controllers
             return Ok();
         }
 
-        private bool UserExists(int id)
+        private async Task<bool> UserExists(int id)
         {
-            return _context.User.Any(e => e.Id == id);
+            return await _context.User.AnyAsync(user => user.Id == id);
+        }
+        private async Task<bool> EmailExists(string email)
+        {
+         return await _context.User.AnyAsync(user => user.Email == email);
         }
     }
 }
