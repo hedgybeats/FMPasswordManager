@@ -17,13 +17,11 @@ namespace PasswordManager.Services
     public class UserService : IUserService
     {
         private readonly AppDbContext _context;
-        private readonly IDateTimeService _dateTimeService;
         private readonly IPasswordService _passwordService;
 
-        public UserService(AppDbContext context, IDateTimeService dateTimeService, IPasswordService passwordService)
+        public UserService(AppDbContext context, IPasswordService passwordService)
         {
             _context = context;
-            _dateTimeService = dateTimeService;
             _passwordService = passwordService;
         }
 
@@ -35,7 +33,6 @@ namespace PasswordManager.Services
             var user = new User
             {
                 Email = addUserDto.Email,
-                MasterPassword = addUserDto.MasterPassword,
                 HashedPassword = _passwordService.HashPassword(addUserDto.MasterPassword)
             };
 
@@ -127,6 +124,11 @@ namespace PasswordManager.Services
         private bool UserExists(int id)
         {
             return _context.User.Any(e => e.Id == id);
+        }
+
+        public async Task<bool> EmailExists(string email)
+        {
+            return await _context.User.AnyAsync(user => user.Email == email);
         }
     }
 }
