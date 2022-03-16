@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PasswordManager.DTOs;
 using PasswordManager.Models;
 using PasswordManager.Services.Interfaces;
@@ -20,6 +21,7 @@ namespace PasswordManager.Controllers
 
         // GET: api/StoredPassword
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<StoredPassword>>> GetStoredPassword()
         {
             return await _storedPasswordService.GetStoredPasswords();
@@ -27,6 +29,7 @@ namespace PasswordManager.Controllers
 
         // GET: api/StoredPassword/5
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult<StoredPassword>> GetStoredPassword(int id)
         {
             return await _storedPasswordService.GetStoredPassword(id);
@@ -34,6 +37,7 @@ namespace PasswordManager.Controllers
 
         // PUT: api/StoredPassword/5
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> PutStoredPassword(int id, StoredPassword storedPassword)
         {
             await _storedPasswordService.PutStoredPassword(id, storedPassword);
@@ -42,6 +46,7 @@ namespace PasswordManager.Controllers
 
         // POST: api/StoredPassword
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<StoredPassword>> PostStoredPassword(AddStoredPasswordDTO addStoredPasswordDto)
         {
             return Ok(new { id = await _storedPasswordService.AddStoredPassword(addStoredPasswordDto) });
@@ -49,10 +54,17 @@ namespace PasswordManager.Controllers
 
         // DELETE: api/StoredPassword/5
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteStoredPassword(int id)
         {
             await _storedPasswordService.DeleteStoredPassword(id);
             return Ok();
+        }
+
+        [Authorize]
+        private bool StoredPasswordExists(int id)
+        {
+            return _context.StoredPassword.Any(e => e.Id == id);
         }
     }
 }
