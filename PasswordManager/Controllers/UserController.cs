@@ -14,14 +14,10 @@ namespace PasswordManager.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly AppDbContext _context;
-        private readonly IDateTimeService _dateTimeService;
         private readonly IEmailSenderService _emailSenderService;
         private readonly IUserService _userService;
-        public UserController(AppDbContext context, IDateTimeService dateTimeService, IEmailSenderService emailSenderService, IUserService userService)
+        public UserController(IEmailSenderService emailSenderService, IUserService userService)
         {
-            _context = context;
-            _dateTimeService = dateTimeService;
             _emailSenderService = emailSenderService;
             _userService = userService;
         }
@@ -62,6 +58,10 @@ namespace PasswordManager.Controllers
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetMasterPassword(string email)
         {
+            if (!await _userService.EmailExists(email))
+            {
+                throw new ApiException($"Email adress {email} could not be found");
+            }
             await _emailSenderService.SenderEmailAsync(email, "Reset Your Password", "reset password body");
             return Ok();
         }

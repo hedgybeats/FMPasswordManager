@@ -14,5 +14,6 @@ namespace PasswordManager.Services.Interfaces
         Task<List<User>> GetUsers();
         Task PutUser(int id, User user);
         string GenerateJwtToken(int userId);
+        Task<bool> EmailExists(string email);
     }
 }
