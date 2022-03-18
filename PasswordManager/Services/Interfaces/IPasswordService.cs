@@ -4,6 +4,6 @@
     {
         string HashPassword(string password);
         bool VerifyPassword(string password, string passwordHash);
-        bool ValidatePassword(string password);
+        void ValidatePassword(string password);
     }
 }

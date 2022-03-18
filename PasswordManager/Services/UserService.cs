@@ -33,8 +33,7 @@ namespace PasswordManager.Services
 
         public async Task<int> AddUser(AddUserDTO addUserDto)
         {
-            if (!_passwordService.ValidatePassword(addUserDto.MasterPassword))
-                throw new ApiException("Password does not meet security conditions.");
+            _passwordService.ValidatePassword(addUserDto.MasterPassword);
 
             var user = new User
             {
@@ -135,7 +134,7 @@ namespace PasswordManager.Services
 
             user.ResetToken = RandomToken();
             await _context.SaveChangesAsync();
-            await _emailSenderService.SenderEmailAsync(email,"Reset Password", $"Your reset password token is {user.ResetToken}");
+            await _emailSenderService.SenderEmailAsync(email, "Reset Password", $"Your reset password token is {user.ResetToken}");
         }
 
         public async Task UpdateMasterPassword(UpdateMasterPasswordDTO updateMasterPasswordDTO)
@@ -143,6 +142,8 @@ namespace PasswordManager.Services
             var user = await _context.User.Where(user => user.ResetToken.Equals(updateMasterPasswordDTO.Token)).SingleOrDefaultAsync();
 
             if (user == null) throw new ApiException("A user with this reset token could not be found");
+
+            _passwordService.ValidatePassword(updateMasterPasswordDTO.NewPassword);
 
             user.HashedPassword = _passwordService.HashPassword(updateMasterPasswordDTO.NewPassword);
 

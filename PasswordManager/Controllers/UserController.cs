@@ -1,12 +1,10 @@
 ﻿using EmailSender.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using PasswordManager.Contexts;
 using PasswordManager.DTOs;
 using PasswordManager.Models;
 using PasswordManager.Services.Interfaces;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace PasswordManager.Controllers
@@ -57,9 +55,16 @@ namespace PasswordManager.Controllers
         }
 
         [HttpPost("reset-password")]
-        public async Task<IActionResult> ResetMasterPassword(string email)   
+        public async Task<IActionResult> ResetMasterPassword(string email)
         {
-            await _userService.ResetMasterPassword(email); 
+            await _userService.ResetMasterPassword(email);
+            return Ok();
+        }
+
+        [HttpPost("update-password")]
+        public async Task<IActionResult> UpdateMasterPassword(UpdateMasterPasswordDTO updateMasterPasswordDTO)
+        {
+            await _userService.UpdateMasterPassword(updateMasterPasswordDTO);
             return Ok();
         }
 
@@ -73,8 +78,8 @@ namespace PasswordManager.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
-           await _userService.DeleteUser(id);
-           return Ok();
-        } 
+            await _userService.DeleteUser(id);
+            return Ok();
+        }
     }
 }

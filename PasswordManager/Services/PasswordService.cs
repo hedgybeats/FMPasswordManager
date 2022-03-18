@@ -1,4 +1,5 @@
-﻿using PasswordManager.Services.Interfaces;
+﻿using PasswordManager.Models;
+using PasswordManager.Services.Interfaces;
 using System.Text.RegularExpressions;
 
 namespace PasswordManager.Services
@@ -17,13 +18,15 @@ namespace PasswordManager.Services
             return BCrypt.Net.BCrypt.HashPassword(password);
         }
 
-        public bool ValidatePassword(string input)
+        public void ValidatePassword(string password)
         {
             hasNumber = new Regex(@"[0-9]+");
             hasUpperChar = new Regex(@"[A-Z]+");
             hasMinimum8Chars = new Regex(@".{8,}");
 
-            return (hasNumber.IsMatch(input) && hasUpperChar.IsMatch(input) && hasMinimum8Chars.IsMatch(input));
+            if (hasNumber.IsMatch(password) && hasUpperChar.IsMatch(password) && hasMinimum8Chars.IsMatch(password))
+                throw new ApiException("Password does not meet security conditions.");
+
         }
     }
 }
