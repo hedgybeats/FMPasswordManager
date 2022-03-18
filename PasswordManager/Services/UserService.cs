@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using EmailSender.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using PasswordManager.Contexts;
 using PasswordManager.DTOs;
@@ -9,6 +10,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,18 +19,21 @@ namespace PasswordManager.Services
     public class UserService : IUserService
     {
         private readonly AppDbContext _context;
+        private readonly IDateTimeService _dateTimeService;
         private readonly IPasswordService _passwordService;
+        private readonly IEmailSenderService _emailSenderService;
 
-        public UserService(AppDbContext context, IPasswordService passwordService)
+        public UserService(AppDbContext context, IDateTimeService dateTimeService, IPasswordService passwordService, IEmailSenderService emailSenderService)
         {
             _context = context;
+            _dateTimeService = dateTimeService;
             _passwordService = passwordService;
+            _emailSenderService = emailSenderService;
         }
 
         public async Task<int> AddUser(AddUserDTO addUserDto)
         {
-            if (!_passwordService.ValidatePassword(addUserDto.MasterPassword))
-                throw new ApiException("Password does not meet security conditions.");
+            _passwordService.ValidatePassword(addUserDto.MasterPassword);
 
             var user = new User
             {
@@ -120,6 +125,30 @@ namespace PasswordManager.Services
             return tokenHandler.WriteToken(token);
         }
 
+        public async Task ResetMasterPassword(string email)
+        {
+            var user = await _context.User.Where(x => x.Email.Equals(email)).SingleOrDefaultAsync();
+
+            if (user == null) throw new ApiException($"A user with email {email} could not be found.");
+
+            user.ResetToken = RandomToken();
+            await _context.SaveChangesAsync();
+            await _emailSenderService.SenderEmailAsync(email, "Reset Password", $"Your reset password token is {user.ResetToken}");
+        }
+
+        public async Task UpdateMasterPassword(UpdateMasterPasswordDTO updateMasterPasswordDTO)
+        {
+            var user = await _context.User.Where(user => user.ResetToken.Equals(updateMasterPasswordDTO.Token)).SingleOrDefaultAsync();
+
+            if (user == null) throw new ApiException("A user with this reset token could not be found");
+
+            _passwordService.ValidatePassword(updateMasterPasswordDTO.NewPassword);
+
+            user.HashedPassword = _passwordService.HashPassword(updateMasterPasswordDTO.NewPassword);
+
+            await _context.SaveChangesAsync();
+        }
+
         private bool UserExists(int id)
         {
             return _context.User.Any(e => e.Id == id);
@@ -128,6 +157,14 @@ namespace PasswordManager.Services
         public async Task<bool> EmailExists(string email)
         {
             return await _context.User.AnyAsync(user => user.Email == email);
+        }
+
+        private string RandomToken()
+        {
+            using var rng = RandomNumberGenerator.Create();
+            var uintBuffer = new byte[40];
+            rng.GetBytes(uintBuffer);
+            return BitConverter.ToString(uintBuffer, 0).Replace("-", "");
         }
     }
 }

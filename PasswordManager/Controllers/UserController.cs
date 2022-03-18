@@ -59,11 +59,14 @@ namespace PasswordManager.Controllers
 
         public async Task<IActionResult> ResetMasterPassword(string email)
         {
-            if (!await _userService.EmailExists(email))
-            {
-                throw new ApiException($"Email adress {email} could not be found");
-            }
-            await _emailSenderService.SenderEmailAsync(email, "Reset Your Password", "reset password body");
+            await _userService.ResetMasterPassword(email);
+            return Ok();
+        }
+
+        [HttpPost("update-password")]
+        public async Task<IActionResult> UpdateMasterPassword(UpdateMasterPasswordDTO updateMasterPasswordDTO)
+        {
+            await _userService.UpdateMasterPassword(updateMasterPasswordDTO);
             return Ok();
         }
 

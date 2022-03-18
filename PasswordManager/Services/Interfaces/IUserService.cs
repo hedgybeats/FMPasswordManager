@@ -15,5 +15,7 @@ namespace PasswordManager.Services.Interfaces
         Task PutUser(int id, User user);
         string GenerateJwtToken(int userId);
         Task<bool> EmailExists(string email);
+        Task ResetMasterPassword(string email);
+        Task UpdateMasterPassword(UpdateMasterPasswordDTO updateMasterPasswordDTO);
     }
 }

@@ -12,5 +12,6 @@ namespace PasswordManager.Models
         public string Email { get; set; }
         public string HashedPassword { get; set; }
         public ICollection<StoredPassword> StoredPasswords { get; set; }
+        public string ResetToken { get; set; }
     }
 }
