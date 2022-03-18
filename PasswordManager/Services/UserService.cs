@@ -44,7 +44,7 @@ namespace PasswordManager.Services
 
         public async Task<string> AuthenticateUser(AuthenticateUserDTO authenticateUserDto)
         {
-            var user = await _context.User.Where(x => x.Email.Equals(authenticateUserDto.UserName)).SingleOrDefaultAsync();
+            var user = await _context.User.Where(x => x.Email.Equals(authenticateUserDto.Email)).SingleOrDefaultAsync();
 
             if (user == null || !_passwordService.VerifyPassword(authenticateUserDto.MasterPassword, user.HashedPassword))
                 throw new ApiException("Username or password is incorrect.");
@@ -123,33 +123,6 @@ namespace PasswordManager.Services
         private bool UserExists(int id)
         {
             return _context.User.Any(e => e.Id == id);
-        }
-
-        public int? ValidateJwtToken(string token)
-        {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes("[SECRET USED TO SIGN AND VERIFY JWT TOKENS, IT CAN BE ANY STRING]");
-            try
-            {
-                tokenHandler.ValidateToken(token, new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                    ClockSkew = TimeSpan.Zero
-                }, out SecurityToken validatedToken);
-
-                var jwtToken = (JwtSecurityToken)validatedToken;
-                var UserId = int.Parse(jwtToken.Claims.First(x => x.Type == "id").Value);
-
-                return UserId;
-            }
-            catch
-            {
-                // return null if validation fails
-                return null;
-            }
         }
 
         public async Task<bool> EmailExists(string email)

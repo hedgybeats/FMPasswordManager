@@ -13,6 +13,7 @@ using PasswordManager.Middleware;
 using PasswordManager.Services;
 using PasswordManager.Services.Interfaces;
 using System.Collections.Generic;
+using WebApi.Middleware;
 
 namespace PasswordManager
 {
@@ -108,6 +109,8 @@ namespace PasswordManager
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseMiddleware<JwtMiddleware>();
 
             app.UseMiddleware<ErrorHandlerMiddleware>();
 

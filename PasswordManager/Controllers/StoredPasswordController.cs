@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using PasswordManager.DTOs;
+using PasswordManager.Helpers;
 using PasswordManager.Models;
 using PasswordManager.Services.Interfaces;
 using System.Collections.Generic;
@@ -59,12 +59,6 @@ namespace PasswordManager.Controllers
         {
             await _storedPasswordService.DeleteStoredPassword(id);
             return Ok();
-        }
-
-        [Authorize]
-        private bool StoredPasswordExists(int id)
-        {
-            return _context.StoredPassword.Any(e => e.Id == id);
         }
     }
 }

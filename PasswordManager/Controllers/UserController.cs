@@ -1,8 +1,8 @@
 ﻿using EmailSender.Services.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PasswordManager.Contexts;
 using PasswordManager.DTOs;
+using PasswordManager.Helpers;
 using PasswordManager.Models;
 using PasswordManager.Services.Interfaces;
 using System.Collections.Generic;
@@ -49,13 +49,14 @@ namespace PasswordManager.Controllers
 
         // POST: api/Users
         [HttpPost]
-        [Authorize]
         public async Task<ActionResult<User>> PostUser(AddUserDTO addUserDto)
         {
             return Ok(new { id = await _userService.AddUser(addUserDto) });
         }
 
         [HttpPost("reset-password")]
+        [Authorize]
+
         public async Task<IActionResult> ResetMasterPassword(string email)
         {
             if (!await _userService.EmailExists(email))

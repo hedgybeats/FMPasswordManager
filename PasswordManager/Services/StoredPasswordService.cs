@@ -81,7 +81,7 @@ namespace PasswordManager.Services
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!PasswordExists(id))
+                if (!StoredPasswordExists(id))
                 {
                     throw new ApiException($"A Password: {id} was found.");
                 }
@@ -91,9 +91,9 @@ namespace PasswordManager.Services
                 }
             }
         }
-        private bool PasswordExists(int Password)
+        private bool StoredPasswordExists(int id)
         {
-            return _context.StoredPassword.Any(user => user.Id == Password);
+            return _context.StoredPassword.Any(StoredPassword => StoredPassword.Id == id);
         }
     }
 }
