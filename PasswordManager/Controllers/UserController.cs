@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PasswordManager.Contexts;
 using PasswordManager.DTOs;
+using PasswordManager.Helpers;
 using PasswordManager.Models;
 using PasswordManager.Services.Interfaces;
 using System.Collections.Generic;
@@ -13,20 +14,17 @@ namespace PasswordManager.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly AppDbContext _context;
-        private readonly IDateTimeService _dateTimeService;
         private readonly IEmailSenderService _emailSenderService;
         private readonly IUserService _userService;
-        public UserController(AppDbContext context, IDateTimeService dateTimeService, IEmailSenderService emailSenderService, IUserService userService)
+        public UserController(IEmailSenderService emailSenderService, IUserService userService)
         {
-            _context = context;
-            _dateTimeService = dateTimeService;
             _emailSenderService = emailSenderService;
             _userService = userService;
         }
 
         // GET: api/Users
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<ICollection<User>>> GetUsers()
         {
             return await _userService.GetUsers();
@@ -34,6 +32,7 @@ namespace PasswordManager.Controllers
 
         // GET: api/Users/5
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult<User>> GetUser(int id)
         {
             return await _userService.GetUser(id);
@@ -41,6 +40,7 @@ namespace PasswordManager.Controllers
 
         // PUT: api/Users/5
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> PutUser(int id, User user)
         {
             await _userService.PutUser(id, user);
@@ -55,6 +55,8 @@ namespace PasswordManager.Controllers
         }
 
         [HttpPost("reset-password")]
+        [Authorize]
+
         public async Task<IActionResult> ResetMasterPassword(string email)
         {
             await _userService.ResetMasterPassword(email);
@@ -71,11 +73,12 @@ namespace PasswordManager.Controllers
         [HttpPost("authenticate")]
         public async Task<IActionResult> AuthentiateUser(AuthenticateUserDTO authenticateUserDto)
         {
-            return Ok(new { id = await _userService.AuthenticateUser(authenticateUserDto) });
+            return Ok(new { token = await _userService.AuthenticateUser(authenticateUserDto) });
         }
 
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteUser(int id)
         {
             await _userService.DeleteUser(id);

@@ -47,14 +47,13 @@ namespace PasswordManager.Services
             return user.Id;
         }
 
-        public async Task<int> AuthenticateUser(AuthenticateUserDTO authenticateUserDto)
+        public async Task<string> AuthenticateUser(AuthenticateUserDTO authenticateUserDto)
         {
-            var user = await _context.User.Where(x => x.Email.Equals(authenticateUserDto.UserName)).SingleOrDefaultAsync();
+            var user = await _context.User.Where(x => x.Email.Equals(authenticateUserDto.Email)).SingleOrDefaultAsync();
 
             if (user == null || !_passwordService.VerifyPassword(authenticateUserDto.MasterPassword, user.HashedPassword))
                 throw new ApiException("Username or password is incorrect.");
-            //will return jwt
-            return user.Id;
+            return GenerateJwtToken(user.Id);
         }
 
         public async Task DeleteUser(int id)
@@ -153,6 +152,11 @@ namespace PasswordManager.Services
         private bool UserExists(int id)
         {
             return _context.User.Any(e => e.Id == id);
+        }
+
+        public async Task<bool> EmailExists(string email)
+        {
+            return await _context.User.AnyAsync(user => user.Email == email);
         }
 
         private string RandomToken()

@@ -13,6 +13,7 @@ using PasswordManager.Middleware;
 using PasswordManager.Services;
 using PasswordManager.Services.Interfaces;
 using System.Collections.Generic;
+using WebApi.Middleware;
 
 namespace PasswordManager
 {
@@ -56,6 +57,7 @@ namespace PasswordManager
 
             services.AddScoped<IPasswordService, PasswordService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IStoredPasswordService, StoredPasswordService>();
             // _________________
 
             services.AddSwaggerGen(c =>
@@ -107,6 +109,8 @@ namespace PasswordManager
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseMiddleware<JwtMiddleware>();
 
             app.UseMiddleware<ErrorHandlerMiddleware>();
 
