@@ -14,5 +14,7 @@ namespace PasswordManager.Services.Interfaces
         Task<List<User>> GetUsers();
         Task PutUser(int id, User user);
         string GenerateJwtToken(int userId);
+        Task ResetMasterPassword(string email);
+        Task UpdateMasterPassword(UpdateMasterPasswordDTO updateMasterPasswordDTO);
     }
 }

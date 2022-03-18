@@ -57,9 +57,9 @@ namespace PasswordManager.Controllers
         }
 
         [HttpPost("reset-password")]
-        public async Task<IActionResult> ResetMasterPassword(string email)
+        public async Task<IActionResult> ResetMasterPassword(string email)   
         {
-            await _emailSenderService.SenderEmailAsync(email, "Reset Your Password", "reset password body");
+            await _userService.ResetMasterPassword(email); 
             return Ok();
         }
 
